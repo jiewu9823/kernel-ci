@@ -6,9 +6,9 @@
 
 一台ubuntu 22.04 x86电脑: 部署LAVA和KernelCI(也可以用二台ubuntu 22.04 x86电脑分别部署LAVA和KernelCI)
 
-一台sifive-unmatched通过USB串口连接到x86电脑: 执行测试的设备
+一台sifive-unmatched: 执行测试的设备，通过USB串口连接到x86电脑，并插入已经烧录u-boot镜像的T-Flash卡，且确保从T-Flash卡启动
 
-一台starfive-visionfive通过USB串口连接到x86电脑: 执行测试的设备
+一台starfive-visionfive: 执行测试的设备，通过USB串口连接到x86电脑，并插入已经烧录u-boot镜像的T-Flash卡
 
 这三台设备在同一个局域网中
 
