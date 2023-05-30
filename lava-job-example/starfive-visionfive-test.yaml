@@ -1,0 +1,56 @@
+device_type: jh7100-visionfive
+job_name: starfive-visionfive-test
+context:
+  boot_character_delay: 1000
+  extra_nfsroot_args: ",nolock,nfsvers=3"
+  uboot_needs_interrupt: False
+timeouts:
+  job:
+    minutes: 100
+  action:
+   minutes: 60
+  actions:
+    power-off:
+      seconds: 30
+priority: medium
+visibility: public
+actions:
+- deploy:
+    timeout:
+      minutes: 30
+    to: tftp
+    kernel:
+      url: file:///home/inlinepath/visionfive/Image
+      type: image
+    dtb:
+      url: file:///home/inlinepath/visionfive/jh7100-starfive-visionfive-v1.dtb
+    nfsrootfs:
+      url: https://repo.tarsier-infra.com/openEuler-RISC-V/preview/openEuler-22.03-V2-riscv64/openeuler-rootfs.tar.gz
+      compression: gz
+- boot:
+    timeout:
+      minutes: 60
+    method: u-boot
+    commands: nfs
+    prompts:
+      - 'root@openEuler-riscv64'
+    auto_login:
+      login_prompt: "openEuler-riscv64 login:"
+      username: root
+      password_prompt: "Password:"
+      password: openEuler12#$
+- test:
+    timeout:
+      minutes: 10
+    definitions:
+    - repository:
+        metadata:
+          format: Lava-Test Test Definition 1.0
+          name: smoke-tests-basic
+          description: "Basic system test command for oerv images"
+        run:
+          steps:
+          - printenv
+      from: inline
+      name: env-dut-inline
+      path: inline/env-dut.yaml

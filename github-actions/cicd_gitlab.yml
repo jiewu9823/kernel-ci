@@ -1,0 +1,71 @@
+# This is a basic workflow to help you get started with Actions
+
+name: gitlab kernel build and deploy
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  # push:
+  # pull_request:
+  #   types:
+  #     - closed
+  schedule:
+    - cron:  '0 1 * * *'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build-and-deploy:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout Kernel Source Code
+        uses: actions/checkout@v3
+        with:
+          repository: torvalds/linux
+          ref: master
+
+      # Runs a single command using the runners shell
+      - name: Install Dependency
+        run: |
+          sudo apt update
+          sudo apt install make flex bison bc gcc-riscv64-linux-gnu git -y
+          riscv64-linux-gnu-gcc -v
+      # Runs a set of commands using the runners shell
+      - name: Build
+        run: |
+          make ARCH=riscv defconfig
+          make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- -j $(nproc)
+          mkdir kernel_image
+          # cp arch/riscv/boot/Image kernel_image
+          cp arch/riscv/boot/Image.gz kernel_image
+      
+      # Runs a set of commands using the runners shell
+      - name: Deploy
+        run: |
+          cd kernel_image
+          git init
+          git config --global user.email ${{ secrets.GITLAB_EMAIL }}
+          git config --global user.name ${{ secrets.GITLAB_NAME }}
+          git remote add origin https://${{ secrets.GITLAB_NAME }}:${{ secrets.GITLAB_PWD }}@gitlab.com/jean9823/kernel-image.git
+          git checkout -b main
+          git add --all
+          git commit -m "deploy kernel image"
+          git push origin main -f
+          cd ..
+      
+      - name: Checkout Lava Job
+        uses: actions/checkout@v3
+
+      - name: Trggger Lava Job
+        run: |
+          sudo apt install lavacli -y
+          lavacli --uri http://admin:${{ secrets.LAVA_TOKEN}}@192.168.1.100:8000/RPC2/ jobs submit ./qemu-test/qemu-riscv64-helloworld-test.yaml
+
+

@@ -1,0 +1,103 @@
+device_type: sifive-unmatched
+job_name: sifive-unmatched-ltp-syscalls-test
+context:
+  boot_character_delay: 1000
+  extra_nfsroot_args: ",nolock,nfsvers=3"
+timeouts:
+  job:
+    minutes: 301
+  action:
+   minutes: 300
+  actions:
+    power-off:
+      seconds: 30
+priority: medium
+visibility: public
+metadata:
+  # please change these fields when modifying this job for your own tests.
+  job.arch: riscv64
+  job.build_environment: gcc-11.3.0
+  kernel.defconfig: defconfig
+  kernel.defconfig_full: defconfig
+  device.type: sifive-unmatched
+  platform.dtb: hifive-unmatched-a00.dtb
+  kernel.endian: little
+  git.branch: master
+  git.commit: 44c026a73be8038f03dbdeef028b642880cf1511
+  git.describe: v6.4-rc3
+  git.url: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+  job.initrd_url: none
+  kernel.tree: mainline
+  kernel.version: v6.4-rc3
+  job.kernel_image: image
+  test.plan: ltp
+  test.plan_variant: ltp-syscalls
+  platform.mach: riscv
+notify:
+  criteria:
+    status: finished
+  callbacks:
+    - url: http://192.168.1.100:8081/callback/lava/test?lab_name=lab-01-nantong&status={STATUS}&status_string={STATUS_STRING}
+      method: POST
+      dataset: all
+      token: kernelci-token
+      content-type: json
+# ACTION_BLOCK
+actions:
+- deploy:
+    timeout:
+      minutes: 20
+    to: tftp
+    kernel:
+      url: https://gitlab.com/jean9823/kernel-image/-/raw/test/Image
+      type: image
+    dtb:
+      url: file:///home/inlinepath/hifive-unmatched-a00.dtb
+    nfsrootfs:
+      url: https://repo.tarsier-infra.com/openEuler-RISC-V/preview/openEuler-22.03-V2-riscv64/openeuler-rootfs.tar.gz
+      compression: gz
+- boot:
+    timeout:
+      minutes: 40
+    method: u-boot
+    commands: nfs
+    prompts:
+      - 'root@openEuler-riscv64'
+    auto_login:
+      login_prompt: "openEuler-riscv64 login:"
+      username: root
+      password_prompt: "Password:"
+      password: openEuler12#$
+- test:
+    timeout:
+      minutes: 240
+    definitions:
+    - repository:
+        metadata:
+          format: Lava-Test Test Definition 1.0
+          name: dns-config
+        run:
+          steps:
+          - touch /etc/resolv.conf
+          - echo "nameserver 8.8.8.8" >> /etc/resolv.conf
+          - ping www.baidu.com -c 5
+          - yum update
+          - yum install ca-certificates -y
+      from: inline
+      name: env-dns-dut-inline
+      path: inline/env-dns-dut.yaml
+    - repository: https://github.com/Linaro/test-definitions.git
+      from: git
+      path: automated/linux/ltp/ltp.yaml
+      parameters:
+        TST_CMDFILES: syscalls
+        SKIPFILE: skipfile-lkft.yaml
+        BOARD: sifive-unmatched
+        BRANCH: default
+        ENVIRONMENT: production
+        TIMEOUT_MULTIPLIER: '30'
+        ROOT_PASSWD: openEuler12#$
+        BUILD_FROM_TAR: true
+        LTP_VERSION: 20230516
+        LTP_TMPDIR: /scratch
+      name: ltp-syscalls-tests

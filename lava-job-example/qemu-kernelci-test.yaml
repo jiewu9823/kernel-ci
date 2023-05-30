@@ -1,0 +1,96 @@
+# Your first LAVA JOB definition for an riscv_64 QEMU
+device_type: qemu
+job_name: qemu-kernelci-test
+timeouts:
+  job:
+    minutes: 15
+  action:
+    minutes: 10
+  connection:
+    minutes: 2
+priority: medium
+visibility: public
+# context allows specific values to be overridden or included
+context:
+  # tell the qemu template which architecture is being tested
+  # the template uses that to ensure that qemu-system-riscv64 is executed.
+  arch: riscv64
+  machine: virt
+  guestfs_interface: virtio
+  extra_options:
+    - -machine virt
+    - -nographic
+    - -smp 2
+    - -m 4G
+    - -device virtio-blk-device,drive=hd0
+    - -append "root=/dev/vda rw console=ttyS0"
+    - -device virtio-net-device,netdev=usernet
+    - -netdev user,id=usernet,hostfwd=tcp::10000-:22
+metadata:
+  # please change these fields when modifying this job for your own tests.
+  job.arch: riscv64
+  job.build_environment: risc-v
+  kernel.defconfig: defconfig
+  kernel.defconfig_full: defconfig-full
+  device.type: qemu
+  platform.dtb: none
+  kernel.endian: little
+  git.branch: master
+  git.commit: 581fe2a4874338a1bfc599cae903a6101217b0a5
+  git.describe: v6.4-rc2-581fe2a4874338a1bfc599cae903a6101217b0a5
+  git.url: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+  job.initrd_url: none
+  kernel.tree: stable-rc
+  kernel.version: v6.4-rc2
+  job.kernel_image: image
+  test.plan: qemu-basic
+  test.plan_variant: smoke-echo
+  platform.mach: riscv
+notify:
+  criteria:
+    status: finished
+  callbacks:
+    - url: http://192.168.1.100:8081/callback/lava/test?lab_name=lab-01&status={STATUS}&status_string={STATUS_STRING}
+      method: POST
+      dataset: all
+      token: kernelci-token
+      content-type: json
+# ACTION_BLOCK
+actions:
+# DEPLOY_BLOCK
+- deploy:
+    timeout:
+      minutes: 5
+    to: tmpfs
+    images:
+      kernel:
+        image_arg: -kernel {kernel}
+        url: https://gitlab.com/jean9823/kernel-image/-/raw/test/Image
+      rootfs:
+        image_arg: -drive file={rootfs},format=raw,id=hd0
+        url: file:///home/inlinepath/rootfs.img
+# BOOT_BLOCK
+- boot:
+    timeout:
+      minutes: 6
+    method: qemu
+    media: tmpfs
+    prompts: ["root@openEuler-riscv64"]
+    auto_login:
+      login_prompt: "openEuler-riscv64 login:"
+      username: root
+      password_prompt: "Password:"
+      password: openEuler12#$
+# TEST_BLOCK
+- test:
+    timeout:
+      minutes: 5
+    definitions:
+    - repository: https://git.linaro.org/lava-team/lava-functional-tests.git
+      from: git
+      path: lava-test-shell/smoke-tests-basic.yaml
+      name: smoke-tests
+    - repository: https://git.linaro.org/lava-team/lava-functional-tests.git
+      from: git
+      path: lava-test-shell/fedora/echo-pass-fail-error-test.yaml
+      name: echo-tests

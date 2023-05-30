@@ -1,0 +1,55 @@
+device_type: sifive-unmatched
+job_name: sifive-unmatched-test
+context:
+  boot_character_delay: 1000
+  extra_nfsroot_args: ",nolock,nfsvers=3"
+timeouts:
+  job:
+    minutes: 81
+  action:
+   minutes: 80
+  actions:
+    power-off:
+      seconds: 30
+priority: medium
+visibility: public
+actions:
+- deploy:
+    timeout:
+      minutes: 30
+    to: tftp
+    kernel:
+      url: https://gitlab.com/jean9823/kernel-image/-/raw/test/Image
+      type: image
+    dtb:
+      url: file:///home/inlinepath/hifive-unmatched-a00.dtb
+    nfsrootfs:
+      url: https://repo.tarsier-infra.com/openEuler-RISC-V/preview/openEuler-22.03-V2-riscv64/openeuler-rootfs.tar.gz
+      compression: gz
+- boot:
+    timeout:
+      minutes: 40
+    method: u-boot
+    commands: nfs
+    prompts:
+      - 'root@openEuler-riscv64'
+    auto_login:
+      login_prompt: "openEuler-riscv64 login:"
+      username: root
+      password_prompt: "Password:"
+      password: openEuler12#$
+- test:
+    timeout:
+      minutes: 10
+    definitions:
+    - repository:
+        metadata:
+          format: Lava-Test Test Definition 1.0
+          name: smoke-tests-basic
+          description: "Basic system test command for oerv images"
+        run:
+          steps:
+          - printenv
+      from: inline
+      name: env-dut-inline
+      path: inline/env-dut.yaml
