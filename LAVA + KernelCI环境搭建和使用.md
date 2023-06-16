@@ -62,10 +62,69 @@ connection: &con1096
 $ sudo service ser2net restart     //重启ser2net service
 ````
 
-###### 1.2.4 安装docker环境
+###### 1.2.4 安装mqtt server
 
-由于使用docker compose部署LAVA和Kernel CI，所以需要安装docker和docker compose, 安装方法参看 https://docs.docker.com/engine/install/ubuntu/
+由于需要通过mqtt来控制设备的电源，所以需要安装mqtt sever, 这里使用的是mosquitto，安装方法可以参考 https://www.vultr.com/docs/install-mosquitto-mqtt-broker-on-ubuntu-20-04-server/
+
+安装mosquitto
+
+````
+$ sudo apt update
+$ sudo apt install -y mosquitto
+$ sudo systemctl status mosquitto
+$ sudo systemctl enable mosquitto      //设置为开机自动启动mosquitto service
+````
+
+配置mosquitto, 创建配置文件
+
+````
+$ sudo vim /etc/mosquitto/conf.d/default.conf
+````
+
+配置文件内容
+
+````
+listener 1883
+allow_anonymous false      //不允许匿名用户连接
+password_file /etc/mosquitto/passwd        //指定password_file路径
+````
+
+创建/etc/mosquitto/passwd文件
+
+````
+$ sudo vim /etc/mosquitto/passwd
+````
+
+编辑用户名密码
+
+````
+<username>:<password>      //用户名:密码
+````
+
+使用mosquitto_passwd将密码文件/etc/mosquitto/passwd加密
+
+````
+$ sudo mosquitto_passwd -U /etc/mosquitto/passwd
+````
+
+查看是否加密成功
+
+````
+$ sudo cat /etc/mosquitto/passwd
+````
+
+配置完成后重启mosquitto service
+
+````
+$ sudo systemctl restart mosquitto
+````
+
+###### 1.2.5 安装docker环境
+
+由于使用docker compose部署LAVA和Kernel CI，所以需要安装docker和docker compose, 安装方法参看 https://docs.docker.com/engine/install/ubuntu/  
+
 为了方便不用sudo执行docker命令，可以将当前用户添加到docker组内
+
 ```
 $ sudo groupadd docker    //添加docker用户组
 $ sudo usermod -a -G docker $(whoami)    //将当前用户添加到docker组内
@@ -73,7 +132,7 @@ $ sudo systemctl restart docker     //重启docker service
 ````
 执行完以上命令，退出当前终端操作界面再次进入，就可以不用sudo执行docker命令了
 
-###### 1.2.5 安装python虚拟环境
+###### 1.2.6 安装python虚拟环境
 
 为了部署kernelci环境干净，最好安装python虚拟环境，在python虚拟环境中部署kernelci
 
