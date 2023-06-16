@@ -575,6 +575,11 @@ admin:secrets.LAVA_TOKEN是存储在github中的可以访问lava的token，也�
 workflow文档的例子存放在本仓库中的github-actions目录下，cicd.yml和cici_gitlab.yml的区别是前者将kernel image发布在当前仓库的指定分支，后者将kernel image发布到gitlab仓库的指定分支
 
 
+参考：  
+https://github.com/kernelci/lava-docker  
+https://master.lavasoftware.org/static/docs/v2/index.html  
+https://github.com/kernelci/kernelci-docker  
+https://kernelci.org/docs/  
 
 
 
