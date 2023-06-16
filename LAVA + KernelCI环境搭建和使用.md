@@ -449,7 +449,7 @@ $ sudo systemctl stop acme         //停止运行acme-service.py脚本
 另外需要注意的是，运行acme-service.py，需要安装脚本用到的python第三方库
 
 ````
-$ pip install paho-mqtt
+$ sudo pip install paho-mqtt
 ````
 
 ##### 3.4 部署lava
