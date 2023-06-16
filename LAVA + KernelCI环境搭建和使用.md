@@ -65,6 +65,13 @@ $ sudo service ser2net restart     //重启ser2net service
 ###### 1.2.4 安装docker环境
 
 由于使用docker compose部署LAVA和Kernel CI，所以需要安装docker和docker compose, 安装方法参看 https://docs.docker.com/engine/install/ubuntu/
+为了方便不用sudo执行docker命令，可以将当前用户添加到docker组内
+```
+$ sudo groupadd docker    //添加docker用户组
+$ sudo usermod -a -G docker $(whoami)    //将当前用户添加到docker组内
+$ sudo systemctl restart docker     //重启docker service
+````
+执行完以上命令，退出当前终端操作界面再次进入，就可以不用sudo执行docker命令了
 
 ###### 1.2.5 安装python虚拟环境
 
