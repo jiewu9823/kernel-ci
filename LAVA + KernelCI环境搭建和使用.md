@@ -180,7 +180,7 @@ def create_lab():
     headers = {
         "Authorization": AUTHORIZATION_TOKEN,
         "Content-Type": "application/json"
-    }ff5ebf29-338b-469f-8f48-32aff3acbba
+    }
 
     payload = {
         "name": "lab-01",
