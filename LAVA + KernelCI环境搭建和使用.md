@@ -142,7 +142,7 @@ python虚拟环境安装可以参看 https://blog.csdn.net/qq_52385631/article/d
 
 ##### 2.1 获取源码
 
-用docker compose部署kernel ci前后端和数据库，由于官方提供的kernelci-docker( https://github.com/kernelci/kernelci-docker )中的kernelci-frontend和kernel-backend关联的代码版本比较旧，我做了更新，和kernel ci官网前后端代码版本保持一致（https://linux.kernelci.org），更新后的kernelci-docker源码存储在 https://github.com/jiewu-plct/kernelci-docker
+用docker compose部署kernel ci前后端和数据库，由于官方提供的kernelci-docker( https://github.com/kernelci/kernelci-docker )中的kernelci-frontend和kernel-backend关联的代码版本比较旧，我做了更新，和kernel ci官网前后端代码版本保持一致（ https://linux.kernelci.org ），更新后的kernelci-docker源码存储在 https://github.com/jiewu-plct/kernelci-docker
 
 ````
 $ git clone https://github.com/jiewu-plct/kernelci-docker.git
