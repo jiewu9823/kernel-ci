@@ -646,6 +646,7 @@ https://github.com/kernelci/lava-docker
 https://master.lavasoftware.org/static/docs/v2/index.html  
 https://github.com/kernelci/kernelci-docker  
 https://kernelci.org/docs/  
+https://master.lavasoftware.org/static/docs/v2/lavacli.html?highlight=api
 
 
 
