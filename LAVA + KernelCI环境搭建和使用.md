@@ -10,7 +10,9 @@
 
 一台starfive-visionfive: 执行测试的设备，通过USB串口连接到x86电脑，并插入已经烧录u-boot镜像的T-Flash卡
 
-这三台设备在同一个局域网中
+一台继电器: 通过杜邦线与sifive-unmatched和starfive-visionfive相连，用于控制这两台设备的电源
+
+这四台设备在同一个局域网中
 
 ###### 1.2 软件环境
 
