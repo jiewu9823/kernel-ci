@@ -35,7 +35,7 @@ $ sudo service nfs-kernel-server restart   //配置完成后重启NFS server
 
 ###### 1.2.3 安装ser2net
 
-安装ser2net为了部署主机通过串口可以连接到测试设备
+安装ser2net为了部署主机通过telnet可以连接到测试设备
 
 ````
 $ sudo apt install ser2net
