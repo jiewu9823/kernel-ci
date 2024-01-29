@@ -29,7 +29,7 @@ context:
 metadata:
   # please change these fields when modifying this job for your own tests.
   format: Lava-Test Test Definition 1.0
-  name: qrmu-riscv64-kernel-test
+  name: qemu-riscv64-kernel-test
   description: "test for riscv64 qemu kernel image"
   version: "1.0"
 # ACTION_BLOCK
